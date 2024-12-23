@@ -22,64 +22,84 @@ app.whenReady().then(() => {
     createWindow();
 });
 
-
+let port;
 ipcMain.on('connect_request', (event, data) => {
     if (data) {
-        const port = new SerialPort({
+        port = new SerialPort({
             path: 'COM' + data,
             baudRate: 115200
         });
-        port.on('open', () => {
-            console.log('Serial port opened at COM' + data);
-            if (mainWindow) {
-                mainWindow.webContents.send('connect_request', 'success');
-            }
-        
-            port.on('data', (data) => {
-                if (mainWindow) {
-                    mainWindow.webContents.send('serial-data', data.toString());
-                }
-            });
-        
-            port.on('error', (err) => {
-                console.error('Error:', err.message);
-            });
-        });
-
-        if (port && port.isOpen) {
-            port.write('2,0,0,0,3,0', (err) => { // 1/2(control/pid), p, i, d, 1/2/3(forward, right, left), speed why 3?
-              if (err) {
-                console.error('Error on write: ', err.message);
-              } else {
-                console.log('Data sent');
-              }
-            });
-        }
+        connectToPortAndReadData(data);
 
         ipcMain.on('send_data', (event, data) => {
-            if (port && port.isOpen) {
-                port.write(data, (err) => {
-                  if (err) {
-                    console.error('Error on write: ', err.message);
-                  } else {
-                    console.log('Data sent: ', data);
-                  }
-                });
-            }
+            sendData(data);
         });
     }
 });
-
-
-
-app.on('window-all-closed', () => {
-    if (process.platform !== 'darwin') {
-        app.quit();
-    }
+ipcMain.on('disconnect_request', (event, data) => {
+    disconnectPort();
 });
 
-app.on('activate', () => {
-    if (BrowserWindow.getAllWindows().length === 0) {
-        createWindow();
+
+function connectToPortAndReadData(portNumber){
+    port.on('open', () => {
+        console.log('Serial port opened at COM' + portNumber);
+        if (mainWindow) {
+            mainWindow.webContents.send('connect_request', 'success');
+        }
+    
+        port.on('data', (data) => {
+            if (mainWindow) {
+                mainWindow.webContents.send('serial-data', data.toString());
+            }
+        });
+    
+        port.on('error', (err) => {
+            console.error('Error: DGDFJGFS%S^%S*&^%SFSGF');
+        });
+    });
+    if (port && port.isOpen) {
+        port.write('2,0,0,0,3,0', (err) => { // 1/2(control/pid), p, i, d, 1/2/3(forward, right, left), speed
+          if (err) {
+            console.error('Error on write: ', err.message);
+          } else {
+            console.log('Data sent');
+          }
+        });
     }
-});
+}
+
+function sendData(data){
+    if (port && port.isOpen) {
+        port.write(data, (err) => {
+          if (err) {
+            console.error('Error on write: ', err.message);
+          } else {
+            console.log('Data sent: ', data);
+          }
+        });
+    }
+}
+
+function disconnectPort() {
+    if (port && port.isOpen) {
+        port.close((err) => {
+            if (err) {
+                console.error('Error while closing the port:', err.message);
+                if (mainWindow) {
+                    mainWindow.webContents.send('disconnect_request', 'failed');
+                }
+            } else {
+                console.log('Serial port closed successfully');
+                if (mainWindow) {
+                    mainWindow.webContents.send('disconnect_request', 'success');
+                }
+            }
+        });
+    } else {
+        console.log('Port is not open');
+        if (mainWindow) {
+            mainWindow.webContents.send('disconnect_request', 'not_open');
+        }
+    }
+}

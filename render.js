@@ -16,15 +16,20 @@ let history = document.querySelector('.history');
 let highlighter = document.querySelector('.highlighter');
 let pid_mode = document.querySelector('.pid_mode');
 let ctrl_mode = document.querySelector('.ctrl_mode');
-let arrow_image = document.querySelector('.arrow_image');
+let top_arrow = document.querySelector('.top_arrow');
+let bottom_arrow = document.querySelector('.bottom_arrow');
+let left_arrow = document.querySelector('.left_arrow');
+let right_arrow = document.querySelector('.right_arrow');
+
+
 
 let com = document.querySelector('.com');
-let connect = document.querySelector('.connect span');
 let connectbtn = document.querySelector('.connect');
+let connectSVG = document.querySelector('.connect svg');
+
 
 
 let play_pause_span = document.querySelector('.play_pause span');
-
 
 p_slider.oninput = function() {
     p_value.value = (p_slider.value)/100000;
@@ -118,9 +123,9 @@ function control(){
     highlighter.style.width = '80px';
 
     pid_mode.style.opacity = '0';
-    ctrl_mode.style.visibility = 'visible';
+    ctrl_mode.style.display = 'flex';
     setTimeout(() => {
-        pid_mode.style.visibility = 'hidden';
+        pid_mode.style.display = 'none';
         ctrl_mode.style.opacity = '1';
     }, 300);
     mode_selected = 'ctrl';
@@ -131,59 +136,44 @@ function pid(){
     highlighter.style.width = '40px';
 
     ctrl_mode.style.opacity = '0';
-    pid_mode.style.visibility = 'visible';
+    pid_mode.style.display = 'flex';
     setTimeout(() => {
-        ctrl_mode.style.visibility = 'hidden';
+        ctrl_mode.style.display = 'none';
         pid_mode.style.opacity = '1';
     }, 300);
     mode_selected = 'pid';
 }
 
+let keyPressed = false;
 document.addEventListener("keydown", function(event) {
     var keyCode = event.keyCode;
+    if(!keyPressed){
+        if (keyCode == 38){
+            keyPressed = true;
+            ipcRenderer.send("send_data", `1,0,0,0,1,${real_value.value}`);
+        }
 
-    if (keyCode == 38){
-        ipcRenderer.send("send_data", `1,0,0,0,1,${real_value.value}`);
-        arrow_image.style.transform = "rotate(0deg)";
-        arrow_image.style.left = "50px";
-        arrow_image.style.bottom = "60px";
-        arrow_image.style.opacity = 0.9;
-        setTimeout(() => {
-            arrow_image.style.opacity = 0;
-        }, 100);
+        else if (keyCode == 39){
+            keyPressed = true;
+            ipcRenderer.send("send_data", `1,0,0,0,2,${real_value.value}`);
+        }
+
+        else if (keyCode == 37){
+            keyPressed = true;
+            ipcRenderer.send("send_data", `1,0,0,0,3,${real_value.value}`);
+        }
+
+        else if (keyCode == 40){
+            keyPressed = true;
+            ipcRenderer.send("send_data", `1,0,0,0,3,0`);
+        }
     }
-
-    else if (keyCode == 39){
-        ipcRenderer.send("send_data", `1,0,0,0,2,${real_value.value}`);
-        arrow_image.style.transform = "rotate(90deg)"
-        arrow_image.style.left = "120px";
-        arrow_image.style.bottom = "0px";
-        arrow_image.style.opacity = 1;
-        setTimeout(() => {
-            arrow_image.style.opacity = 0;
-        }, 100);
-    }
-
-    else if (keyCode == 37){
-        ipcRenderer.send("send_data", `1,0,0,0,3,${real_value.value}`);
-        arrow_image.style.transform = "rotate(-90deg)"
-        arrow_image.style.left = "-10px";
-        arrow_image.style.bottom = "0px";
-        arrow_image.style.opacity = 1;
-        setTimeout(() => {
-            arrow_image.style.opacity = 0;
-        }, 100);
-    }
-
-    else if (keyCode == 40){
+});
+document.addEventListener("keyup", function(event) {
+    var keyCode = event.keyCode;
+    if (keyCode){
+        keyPressed = false;
         ipcRenderer.send("send_data", `1,0,0,0,3,0`);
-        arrow_image.style.transform = "rotate(-180deg)"
-        arrow_image.style.left = "50px";
-        arrow_image.style.bottom = "-60px";
-        arrow_image.style.opacity = 1;
-        setTimeout(() => {
-            arrow_image.style.opacity = 0;
-        }, 100);
     }
 });
 
@@ -278,22 +268,24 @@ function throttleUpdate(chart, newData) {
   }
 }
 
-
-function connect_f() {
-    ipcRenderer.send("connect_request", com.value);
-}
-
 let connected = false;
+function connect_f() {
+    if (!connected){
+        ipcRenderer.send("connect_request", com.value);
+    }else{
+        ipcRenderer.send("disconnect_request");
+    }
+}
 
 ipcRenderer.on('connect_request', (event, data) => {
     if (data === 'success') {
         connected = true;
-        connect.innerHTML = 'link'; 
+        connectbtn.innerHTML = connectbtn.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" height="35px" viewBox="0 -960 960 960" width="35px" fill="#e8eaed"><path d="m770-302-60-62q40-11 65-42.5t25-73.5q0-50-35-85t-85-35H520v-80h160q83 0 141.5 58.5T880-480q0 57-29.5 105T770-302ZM634-440l-80-80h86v80h-6ZM792-56 56-792l56-56 736 736-56 56ZM440-280H280q-83 0-141.5-58.5T80-480q0-69 42-123t108-71l74 74h-24q-50 0-85 35t-35 85q0 50 35 85t85 35h160v80ZM320-440v-80h65l79 80H320Z"/></svg>DISCONNECT';
 
         ipcRenderer.on('serial-data', (event, data) => {
             console.log(data);
             let data_parts = data.split(",");
-            let pid_data = parseFloat(data_parts[3]);
+            let pid_data = parseFloat(data_parts[3]);// data consists of 3 values, last value is the error
             if (!isNaN(pid_data)) {
                 const newData = {
                     timestamp: Date.now(),
@@ -304,6 +296,12 @@ ipcRenderer.on('connect_request', (event, data) => {
                 }
             }
         });
+    }
+});
+ipcRenderer.on('disconnect_request', (event, data) => {
+    if (data === 'success') {
+        connected = false;
+        connectbtn.innerHTML = connectbtn.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" height="35px" viewBox="0 -960 960 960" width="35px" fill="#e8eaed"><path d="M440-280H280q-83 0-141.5-58.5T80-480q0-83 58.5-141.5T280-680h160v80H280q-50 0-85 35t-35 85q0 50 35 85t85 35h160v80ZM320-440v-80h320v80H320Zm200 160v-80h160q50 0 85-35t35-85q0-50-35-85t-85-35H520v-80h160q83 0 141.5 58.5T880-480q0 83-58.5 141.5T680-280H520Z"/></svg>CONNECT';
     }
 });
 

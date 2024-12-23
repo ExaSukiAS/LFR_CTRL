@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Document</title>
-    <link rel="stylesheet" href="style.scss" />
+    <link rel="stylesheet" href="style.css" />
 
     <link
     rel="stylesheet"
@@ -28,16 +28,14 @@
 <div class = "top_parts">
   <div class = "left_group">
     <button class = "data_push" onclick = "push_data_f()">PUSH DATA</button>
-    <input class = "com" placeholder = "COM PORT">
-    <button class = "connect" onclick = "connect_f()"><span class="material-symbols-outlined">link_off</span></button>
+    <input class = "com" type = "number" placeholder = "COM PORT">
+    <button class = "connect" onclick = "connect_f()"><svg xmlns="http://www.w3.org/2000/svg" height="35px" viewBox="0 -960 960 960" width="35px" fill="#e8eaed"><path d="M440-280H280q-83 0-141.5-58.5T80-480q0-83 58.5-141.5T280-680h160v80H280q-50 0-85 35t-35 85q0 50 35 85t85 35h160v80ZM320-440v-80h320v80H320Zm200 160v-80h160q50 0 85-35t35-85q0-50-35-85t-85-35H520v-80h160q83 0 141.5 58.5T880-480q0 83-58.5 141.5T680-280H520Z"/></svg>CONNECT</button>
   </div>
 
   <div class = "right_group">
     <div class = "bot_battery">
-      <div class = "fill_battery"></div>
-      <div class = "voltage">4.20V</div>
+      <div class = "fill_battery"><div class = "voltage">4.20V</div></div>
     </div>
-    <div class = "percentage">100%</div>
     <div class = "mode">
       <button class = "ctrl" onclick="control()">Control</button>
       <button class = "pid" onclick = "pid()">PID</button>
@@ -51,57 +49,68 @@
     <div class = "proportional">
       <input  class = "p_slider" type="range" min="0" max="1000000" value="0">
       <div class = "p_addsub">
-          <button class = "p_sub" onclick = "p_sub_f('.p_addsub_val')">-</button>
-          <input class = "p_addsub_val" type="text" value = "0">
-          <button class = "p_add" onclick = "p_add_f('.p_addsub_val')">+</button>
+          <button class = "p_sub" onclick = "p_sub_f('.p_addsub_val')" title="decrement value by step size">-</button>
+          <input class = "p_addsub_val" type="number" value = "0" title="step size">
+          <button class = "p_add" onclick = "p_add_f('.p_addsub_val')" title="increment value by step size">+</button>
       </div>
-      <input class = "p_value" type = "text" value = "0">
+      <input class = "p_value" type = "number" value = "0">
       <div class = 'p_symbol'>P</div>
     </div>
 
     <div class = "integral">
       <input  class = "i_slider" type="range" min="0" max="1000000" value="0">
       <div class = "i_addsub">
-          <button class = "i_sub" onclick = "i_sub_f('.i_addsub_val')">-</button>
-          <input class = "i_addsub_val" type="text" value = "0">
-          <button class = "i_add" onclick = "i_add_f('.i_addsub_val')">+</button>
+          <button class = "i_sub" onclick = "i_sub_f('.i_addsub_val')" title="decrement value by step size">-</button>
+          <input class = "i_addsub_val" type="number" value = "0" title="step size">
+          <button class = "i_add" onclick = "i_add_f('.i_addsub_val')" title="increment value by step size">+</button>
       </div>
-      <input class = "i_value" type = "text" value = "0">
+      <input class = "i_value" type = "number" value = "0">
       <div class = 'i_symbol'>I</div>
     </div>
 
     <div class = "derivative">
       <input  class = "d_slider" type="range" min="0" max="1000000" value="0">
       <div class = "d_addsub">
-          <button class = "d_sub" onclick = "d_sub_f('.d_addsub_val')">-</button>
-          <input class = "d_addsub_val" type="text" value = "0">
-          <button class = "d_add" onclick = "d_add_f('.d_addsub_val')">+</button>
+          <button class = "d_sub" onclick = "d_sub_f('.d_addsub_val')" title="decrement value by step size">-</button>
+          <input class = "d_addsub_val" type="number" value = "0" title="step size">
+          <button class = "d_add" onclick = "d_add_f('.d_addsub_val')" title="increment value by step size">+</button>
       </div>
-      <input class = "d_value" type = "text" value = "0">
+      <input class = "d_value" type = "number" value = "0">
       <div class = 'd_symbol'>D</div>
     </div>
   </div>
 
-  <div class = "history">
-      <span style = "margin-top: 5px;">History</span>
-  </div>
-
-  <div class = "error_graph">
+  <div class = "history_err_group">
+    <div class = "history">
+        <span style = "margin-top: 5px;">History</span>
+    </div>
     <div class = "err_cnt">
       <canvas id="err_graph" class = "err_graph"></canvas>
     </div>
-    <button class = "play_pause" onclick = "play_pause_f()"><span class="material-symbols-outlined">stop_circle</span></button>
-  </div>
+    <button class = "play_pause" onclick = "play_pause_f()"><svg xmlns="http://www.w3.org/2000/svg" height="35px" viewBox="0 -960 960 960" width="35px" fill="#e8eaed"><path d="M320-320h320v-320H320v320ZM480-80q-83 0-156-31.5T197-197q-54-54-85.5-127T80-480q0-83 31.5-156T197-763q54-54 127-85.5T480-880q83 0 156 31.5T763-763q54 54 85.5 127T880-480q0 83-31.5 156T763-197q-54 54-127 85.5T480-80Zm0-80q134 0 227-93t93-227q0-134-93-227t-227-93q-134 0-227 93t-93 227q0 134 93 227t227 93Zm0-320Z"/></svg></button>
+</div>
 </div>
 
 <div class = "ctrl_mode">
-  <div class = "ctrl_head">Use Arrow keys to control the bot</div>
-  <div class = "ctrl_rect">
-    <img class = "arrow_image" src = "arrow.png">
+  <div class = "arrow_group">
+    <div class = "top_arrow"><svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="#e8eaed"><path d="M480-528 296-344l-56-56 240-240 240 240-56 56-184-184Z"/></svg></div>
+    <div class = "bottom_arrow"><svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="#e8eaed"><path d="M480-344 240-584l56-56 184 184 184-184 56 56-240 240Z"/></svg></div>
+
+    <div class = "left_arrow"><svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="#e8eaed"><path d="M560-240 320-480l240-240 56 56-184 184 184 184-56 56Z"/></svg></div>
+    <div class = "right_arrow"><svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="#e8eaed"><path d="M504-480 320-664l56-56 240 240-240 240-56-56 184-184Z"/></svg></div>
   </div>
   <input type="range" min="0" max="4096" value="0" class="speed_slider">
-  <input class = "real_value">
-  <input class = "percentage_value">
+  <div class = "speed_input_group">
+    <div class = "percentage_value_group">
+      <label for="percentage_value">Speed(0 to 100%): </label>
+      <input class = "percentage_value" type = "number">
+    </div>
+    <div class = "real_value_group">
+      <label for="percentage_value">Speed(analog): </label>
+      <input class = "real_value" type = "number">
+    </div>
+  </div>
+  <div class = "ctrl_head">Use Keyboard or display Arrow keys to control the bot</div>
 </div>
 
 </body>
