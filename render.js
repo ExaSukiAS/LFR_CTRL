@@ -1,35 +1,31 @@
+/*
+
+Data format:
+
+Send to esp32:
+Mode: control=0 or PID=1,
+Proportional(p) value,
+Integral(I) value,
+Derivetive(D) value, 
+control direction: Forward=0 or Right=1 or Left=2,
+Speed value(0.0% - 100.0%)
+
+Receive from Esp32:
+IR1, IR2, IR3, IR4, IR5, IR6, IR7, IR8, Battery voltage
+
+
+*/
+
 const { ipcRenderer } = require('electron');
 
 let p_value = document.querySelector('.p_value');
 let i_value = document.querySelector('.i_value');
 let d_value = document.querySelector('.d_value');
-let real_value = document.querySelector('.real_value');
 let percentage_value = document.querySelector('.percentage_value');
-
 let p_slider = document.querySelector('.p_slider');
 let i_slider = document.querySelector('.i_slider');
 let d_slider = document.querySelector('.d_slider');
 let speed_slider = document.querySelector('.speed_slider');
-
-let history = document.querySelector('.history');
-
-let highlighter = document.querySelector('.highlighter');
-let pid_mode = document.querySelector('.pid_mode');
-let ctrl_mode = document.querySelector('.ctrl_mode');
-let top_arrow = document.querySelector('.top_arrow');
-let bottom_arrow = document.querySelector('.bottom_arrow');
-let left_arrow = document.querySelector('.left_arrow');
-let right_arrow = document.querySelector('.right_arrow');
-
-
-
-let com = document.querySelector('.com');
-let connectbtn = document.querySelector('.connect');
-let connectSVG = document.querySelector('.connect svg');
-
-
-
-let play_pause_span = document.querySelector('.play_pause span');
 
 p_slider.oninput = function() {
     p_value.value = (p_slider.value)/100000;
@@ -41,7 +37,6 @@ d_slider.oninput = function() {
     d_value.value = (d_slider.value)/100000;
 }
 speed_slider.oninput = function() {
-    real_value.value = speed_slider.value;
     percentage_value.value = (speed_slider.value)/40.96;
 }
 
@@ -54,14 +49,9 @@ i_value.oninput = function() {
 d_value.oninput = function() {
     d_slider.value = (d_value.value)*100000;
 }
-real_value.oninput = function() {
-    speed_slider.value = real_value.value;
-    percentage_value.value = (real_value.value)/40.96;
-}
 
 percentage_value.oninput = function() {
     speed_slider.value = (percentage_value.value) * 40.96;
-    real_value.value = (percentage_value.value) * 40.96;
 }
 
 function p_sub_f(input_element) {
@@ -97,24 +87,16 @@ function d_add_f(input_element) {
     d_value.value = parseFloat(d_value.value) + difference;
 }
 
+let history = document.querySelector('.history');
 
-function push_data_f(){
-    let p_value_numeric = parseFloat(p_value.value); 
-    let p_value_formatted = p_value_numeric.toFixed(5);
-    let i_value_numeric = parseFloat(i_value.value); 
-    let i_value_formatted = i_value_numeric.toFixed(5);
-    let d_value_numeric = parseFloat(d_value.value); 
-    let d_value_formatted = d_value_numeric.toFixed(5);
+let highlighter = document.querySelector('.highlighter');
+let pid_mode = document.querySelector('.pid_mode');
+let ctrl_mode = document.querySelector('.ctrl_mode');
 
-    let data_string = `${p_value_formatted},${i_value_formatted},${d_value_formatted}`;
-    let pid_value_to_send = `2,${p_value_formatted},${i_value_formatted},${d_value_formatted},3,0`;
-    let history_pid = document.createElement('span');
-    history_pid.className = 'history_pid';
-    history_pid.innerHTML = data_string;
-    history.appendChild(history_pid);
+let com = document.querySelector('.com');
+let connectbtn = document.querySelector('.connect');
 
-    ipcRenderer.send("send_data", pid_value_to_send);
-}
+let play_pause_span = document.querySelector('.play_pause span');
 
 let mode_selected = 'pid';
 
@@ -144,51 +126,73 @@ function pid(){
     mode_selected = 'pid';
 }
 
+function push_data_f(){
+    let p_value_numeric = parseFloat(p_value.value); 
+    let p_value_formatted = p_value_numeric.toFixed(5);
+    let i_value_numeric = parseFloat(i_value.value); 
+    let i_value_formatted = i_value_numeric.toFixed(5);
+    let d_value_numeric = parseFloat(d_value.value); 
+    let d_value_formatted = d_value_numeric.toFixed(5);
+
+    let data_string = `${p_value_formatted},${i_value_formatted},${d_value_formatted}`;
+    let data_stringSaving = `P:${p_value_formatted}, I:${i_value_formatted}, D:${d_value_formatted}`;
+    ipcRenderer.send("savePID", data_stringSaving);
+    let pid_value_to_send = `2,${p_value_formatted},${i_value_formatted},${d_value_formatted},3,0`;
+    let history_pid = document.createElement('span');
+    history_pid.className = 'history_pid';
+    history_pid.innerHTML = data_string;
+    history.appendChild(history_pid);
+
+    ipcRenderer.send("send_data", pid_value_to_send);
+}
+
+
 let keyPressed = false;
 document.addEventListener("keydown", function(event) {
     var keyCode = event.keyCode;
     if(!keyPressed){
-        if (keyCode == 38){
-            keyPressed = true;
-            ipcRenderer.send("send_data", `1,0,0,0,1,${real_value.value}`);
-        }
+        if(mode_selected == 'ctrl'){
+            if (keyCode == 38){
+                keyPressed = true;
+                ipcRenderer.send("send_data", `0,0,0,0,0,${percentage_value.value}`);
+            }
 
-        else if (keyCode == 39){
-            keyPressed = true;
-            ipcRenderer.send("send_data", `1,0,0,0,2,${real_value.value}`);
-        }
+            else if (keyCode == 39){
+                keyPressed = true;
+                ipcRenderer.send("send_data", `0,0,0,0,1,${percentage_value.value}`);
+            }
 
-        else if (keyCode == 37){
-            keyPressed = true;
-            ipcRenderer.send("send_data", `1,0,0,0,3,${real_value.value}`);
-        }
+            else if (keyCode == 37){
+                keyPressed = true;
+                ipcRenderer.send("send_data", `0,0,0,0,2,${percentage_value.value}`);
+            }
 
-        else if (keyCode == 40){
-            keyPressed = true;
-            ipcRenderer.send("send_data", `1,0,0,0,3,0`);
-        }
+            else if (keyCode == 40){
+                keyPressed = true;
+                ipcRenderer.send("send_data", `0,0,0,0,0,0`);
+            }
+        }   
     }
 });
 document.addEventListener("keyup", function(event) {
     var keyCode = event.keyCode;
     if (keyCode){
-        keyPressed = false;
-        ipcRenderer.send("send_data", `1,0,0,0,3,0`);
+        if(mode_selected == 'ctrl'){
+            keyPressed = false;
+            ipcRenderer.send("send_data", `0,0,0,0,0,0`);
+        }
     }
 });
 
 let should_play = true;
-
 function play(){
     play_pause_span.innerHTML = 'stop_circle';
     should_play = true;
 }
-
 function pause(){
     play_pause_span.innerHTML = 'play_circle';
     should_play = false;
 }
-
 let play_pause_count = 0;
 function play_pause_f(){
     play_pause_count += 1;
@@ -201,8 +205,6 @@ function play_pause_f(){
         }
     }
 }
-
-
 const ctx = document.getElementById('err_graph').getContext('2d');
 const myChart = new Chart(ctx, {
   type: 'line',

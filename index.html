@@ -5,24 +5,10 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Document</title>
     <link rel="stylesheet" href="style.css" />
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Space Grotesk:wght@400;700&display=swap"/>
 
-    <link
-    rel="stylesheet"
-    href="https://fonts.googleapis.com/css2?family=Space Grotesk:wght@400;700&display=swap"
-  />
-  <link
-    rel="stylesheet"
-    href="https://fonts.googleapis.com/css2?family=Anek Latin:wght@400&display=swap"
-  />
-  <link
-    rel="stylesheet"
-    href="https://fonts.googleapis.com/css2?family=League Spartan:wght@700&display=swap"
-  />
-
-  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0" />
-  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-  <script src="https://d3js.org/d3.v7.min.js"></script>
-
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://d3js.org/d3.v7.min.js"></script>
 </head>
 <body>
 <div class = "top_parts">
@@ -30,6 +16,16 @@
     <button class = "data_push" onclick = "push_data_f()">PUSH DATA</button>
     <input class = "com" type = "number" placeholder = "COM PORT">
     <button class = "connect" onclick = "connect_f()"><svg xmlns="http://www.w3.org/2000/svg" height="35px" viewBox="0 -960 960 960" width="35px" fill="#e8eaed"><path d="M440-280H280q-83 0-141.5-58.5T80-480q0-83 58.5-141.5T280-680h160v80H280q-50 0-85 35t-35 85q0 50 35 85t85 35h160v80ZM320-440v-80h320v80H320Zm200 160v-80h160q50 0 85-35t35-85q0-50-35-85t-85-35H520v-80h160q83 0 141.5 58.5T880-480q0 83-58.5 141.5T680-280H520Z"/></svg>CONNECT</button>
+    <div class = "IR_states">
+      <div class="IR1"></div>
+      <div class="IR2"></div>
+      <div class="IR3"></div>
+      <div class="IR4"></div>
+      <div class="IR5"></div>
+      <div class="IR6"></div>
+      <div class="IR7"></div>
+      <div class="IR8"></div>
+    </div>
   </div>
 
   <div class = "right_group">
@@ -93,21 +89,17 @@
 
 <div class = "ctrl_mode">
   <div class = "arrow_group">
-    <div class = "top_arrow"><svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="#e8eaed"><path d="M480-528 296-344l-56-56 240-240 240 240-56 56-184-184Z"/></svg></div>
+    <div class = "top_arrow" onclick="goForward()"><svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="#e8eaed"><path d="M480-528 296-344l-56-56 240-240 240 240-56 56-184-184Z"/></svg></div>
     <div class = "bottom_arrow"><svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="#e8eaed"><path d="M480-344 240-584l56-56 184 184 184-184 56 56-240 240Z"/></svg></div>
 
-    <div class = "left_arrow"><svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="#e8eaed"><path d="M560-240 320-480l240-240 56 56-184 184 184 184-56 56Z"/></svg></div>
-    <div class = "right_arrow"><svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="#e8eaed"><path d="M504-480 320-664l56-56 240 240-240 240-56-56 184-184Z"/></svg></div>
+    <div class = "left_arrow" onclick="goLeft()"><svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="#e8eaed"><path d="M560-240 320-480l240-240 56 56-184 184 184 184-56 56Z"/></svg></div>
+    <div class = "right_arrow" onclick="goRight()"><svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="#e8eaed"><path d="M504-480 320-664l56-56 240 240-240 240-56-56 184-184Z"/></svg></div>
   </div>
   <input type="range" min="0" max="4096" value="0" class="speed_slider">
   <div class = "speed_input_group">
     <div class = "percentage_value_group">
-      <label for="percentage_value">Speed(0 to 100%): </label>
+      <label for="percentage_value">Speed(0.0 to 100.0%): </label>
       <input class = "percentage_value" type = "number">
-    </div>
-    <div class = "real_value_group">
-      <label for="percentage_value">Speed(analog): </label>
-      <input class = "real_value" type = "number">
     </div>
   </div>
   <div class = "ctrl_head">Use Keyboard or display Arrow keys to control the bot</div>
