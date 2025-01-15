@@ -7,7 +7,6 @@ Mode: control=0 or PID=1,
 Proportional(p) value,
 Integral(I) value,
 Derivetive(D) value, 
-Follow track: start following = 1, stop following = 0,
 control direction: Forward=0 or Right=1 or Left=2,
 Speed value(0.0% - 100.0%)
 
@@ -16,8 +15,6 @@ IR1, IR2, IR3, IR4, IR5, IR6, IR7, IR8, Battery voltage
 
 
 */
-
-
 
 const { app, BrowserWindow, ipcMain } = require('electron');
 const path = require('path'); 
@@ -108,11 +105,9 @@ function connectToPortAndReadData(portNumber){
         }
     
         port.on('data', (data) => {
+            console.log("got that:" + data.toString());
             if (mainWindow) {
-                let data_parts = data.toString().split(",");
-                if(data_parts.length == 19){
-                    mainWindow.webContents.send('serial-data', data_parts);
-                }
+                mainWindow.webContents.send('serial-data', data.toString());
             }
         });
     
@@ -132,14 +127,8 @@ function connectToPortAndReadData(portNumber){
 }
 
 function sendData(data){
-    if (port && port.isOpen) {
-        port.write(data, (err) => {
-          if (err) {
-            console.error('Error on write: ', err.message);
-          } else {
-            console.log('Data sent: ', data);
-          }
-        });
+    if (port && port.isOpen){
+        port.write(data);
     }
 }
 

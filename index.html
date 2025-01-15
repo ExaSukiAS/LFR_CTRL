@@ -16,21 +16,20 @@
     <button class = "data_push" onclick = "push_data_f()">PUSH DATA</button>
     <input class = "com" type = "number" placeholder = "COM PORT">
     <button class = "connect" onclick = "connect_f()"><svg xmlns="http://www.w3.org/2000/svg" height="35px" viewBox="0 -960 960 960" width="35px" fill="#e8eaed"><path d="M440-280H280q-83 0-141.5-58.5T80-480q0-83 58.5-141.5T280-680h160v80H280q-50 0-85 35t-35 85q0 50 35 85t85 35h160v80ZM320-440v-80h320v80H320Zm200 160v-80h160q50 0 85-35t35-85q0-50-35-85t-85-35H520v-80h160q83 0 141.5 58.5T880-480q0 83-58.5 141.5T680-280H520Z"/></svg>CONNECT</button>
-    <div class = "IR_states">
-      <div class="IR1"></div>
-      <div class="IR2"></div>
-      <div class="IR3"></div>
-      <div class="IR4"></div>
-      <div class="IR5"></div>
-      <div class="IR6"></div>
-      <div class="IR7"></div>
-      <div class="IR8"></div>
-    </div>
   </div>
-
+  <div class = "IR_states">
+    <div class="IR1"></div>
+    <div class="IR2"></div>
+    <div class="IR3"></div>
+    <div class="IR4"></div>
+    <div class="IR5"></div>
+    <div class="IR6"></div>
+    <div class="IR7"></div>
+    <div class="IR8"></div>
+  </div>
   <div class = "right_group">
     <div class = "bot_battery">
-      <div class = "fill_battery"><div class = "voltage">4.20V</div></div>
+      <div class = "fill_battery"><div class = "voltage">--V</div></div>
     </div>
     <div class = "mode">
       <button class = "ctrl" onclick="control()">Control</button>
@@ -41,38 +40,63 @@
 </div>
 
 <div class = "pid_mode">
-  <div class = "pid_control_unit">
-    <div class = "proportional">
-      <input  class = "p_slider" type="range" min="0" max="1000000" value="0">
-      <div class = "p_addsub">
-          <button class = "p_sub" onclick = "p_sub_f('.p_addsub_val')" title="decrement value by step size">-</button>
-          <input class = "p_addsub_val" type="number" value = "0" title="step size">
-          <button class = "p_add" onclick = "p_add_f('.p_addsub_val')" title="increment value by step size">+</button>
+  <div class = "send_data_arguments">
+    <div class = "pid_control_unit">
+      <div class = "proportional">
+        <input  class = "p_slider" type="range" min="0" max="1000000" value="0">
+        <input class = "p_value" type = "number" value = "0">
+        <div class = 'p_symbol'>P</div>
       </div>
-      <input class = "p_value" type = "number" value = "0">
-      <div class = 'p_symbol'>P</div>
-    </div>
 
-    <div class = "integral">
-      <input  class = "i_slider" type="range" min="0" max="1000000" value="0">
-      <div class = "i_addsub">
-          <button class = "i_sub" onclick = "i_sub_f('.i_addsub_val')" title="decrement value by step size">-</button>
-          <input class = "i_addsub_val" type="number" value = "0" title="step size">
-          <button class = "i_add" onclick = "i_add_f('.i_addsub_val')" title="increment value by step size">+</button>
+      <div class = "integral">
+        <input  class = "i_slider" type="range" min="0" max="1000000" value="0">
+        <input class = "i_value" type = "number" value = "0">
+        <div class = 'i_symbol'>I</div>
       </div>
-      <input class = "i_value" type = "number" value = "0">
-      <div class = 'i_symbol'>I</div>
-    </div>
 
-    <div class = "derivative">
-      <input  class = "d_slider" type="range" min="0" max="1000000" value="0">
-      <div class = "d_addsub">
-          <button class = "d_sub" onclick = "d_sub_f('.d_addsub_val')" title="decrement value by step size">-</button>
-          <input class = "d_addsub_val" type="number" value = "0" title="step size">
-          <button class = "d_add" onclick = "d_add_f('.d_addsub_val')" title="increment value by step size">+</button>
+      <div class = "derivative">
+        <input  class = "d_slider" type="range" min="0" max="1000000" value="0">
+        <input class = "d_value" type = "number" value = "0">
+        <div class = 'd_symbol'>D</div>
       </div>
-      <input class = "d_value" type = "number" value = "0">
-      <div class = 'd_symbol'>D</div>
+    </div>
+    <div class = "motor_speed">
+      <div class = "max_left_speed">
+        <label>Max Left Speed: </label>
+        <input class = "max_left" type="number" value="0">
+      </div>
+      <div class = "max_right_speed">
+        <label>Max Right Speed: </label>
+        <input class = "max_right" type="number" value="0">
+      </div>
+      <div class = "base_speed_group">
+        <label>Base Speed: </label>
+        <input class = "base_speed" type="number" value="0">
+      </div>
+    </div>
+    <div class  = "current_left_speed_group">
+      <div class = "current_left_speed_border">
+        <div class = "current_left_speed">
+          <h5>0</h5>
+        </div>
+      </div>
+      <h6>Left Speed</h6>
+    </div>
+    <div class  = "current_right_speed_group">
+      <div class = "current_right_speed_border">
+        <div class = "current_right_speed">
+          <h5>0</h5>
+        </div>
+      </div>
+      <h6>Right Speed</h6>
+    </div>
+    <div class  = "PID_impact_group">
+      <div class = "PID_impact_border">
+        <div class = "PID_impact_speed">
+          <h5>0</h5>
+        </div>
+      </div>
+      <h6>PID impact</h6>
     </div>
   </div>
 
@@ -83,8 +107,11 @@
     <div class = "err_cnt">
       <canvas id="err_graph" class = "err_graph"></canvas>
     </div>
-    <button class = "play_pause" onclick = "play_pause_f()"><svg xmlns="http://www.w3.org/2000/svg" height="35px" viewBox="0 -960 960 960" width="35px" fill="#e8eaed"><path d="M320-320h320v-320H320v320ZM480-80q-83 0-156-31.5T197-197q-54-54-85.5-127T80-480q0-83 31.5-156T197-763q54-54 127-85.5T480-880q83 0 156 31.5T763-763q54 54 85.5 127T880-480q0 83-31.5 156T763-197q-54 54-127 85.5T480-80Zm0-80q134 0 227-93t93-227q0-134-93-227t-227-93q-134 0-227 93t-93 227q0 134 93 227t227 93Zm0-320Z"/></svg></button>
-</div>
+    <div class="play_pause_group">
+      <button class = "play_pause" onclick = "play_pause_f()"><svg xmlns="http://www.w3.org/2000/svg" height="35px" viewBox="0 -960 960 960" width="35px" fill="#e8eaed"><path d="M320-320h320v-320H320v320ZM480-80q-83 0-156-31.5T197-197q-54-54-85.5-127T80-480q0-83 31.5-156T197-763q54-54 127-85.5T480-880q83 0 156 31.5T763-763q54 54 85.5 127T880-480q0 83-31.5 156T763-197q-54 54-127 85.5T480-80Zm0-80q134 0 227-93t93-227q0-134-93-227t-227-93q-134 0-227 93t-93 227q0 134 93 227t227 93Zm0-320Z"/></svg></button>
+      <button class = "start_follow" onclick = "startStop_follow_f()">START FOLLOWING</button>
+    </div>
+  </div>
 </div>
 
 <div class = "ctrl_mode">
