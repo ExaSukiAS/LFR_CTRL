@@ -23,7 +23,6 @@ export const pid_mode_div = document.querySelector('.pid_mode');
 export const ctrl_mode_div = document.querySelector('.ctrl_mode');
 const com_select = document.querySelector('.com');
 const voltage_div = document.querySelector('.voltage');
-const fill_battery_div = document.querySelector('.fill_battery');
 const timer_div = document.querySelector(".timer");
 const message_container_dv = document.querySelector(".message_container");
 const message_div = document.querySelector(".message");
@@ -43,8 +42,8 @@ start_follow_button.addEventListener("click", () =>{startStop_follow_f(1);});
 
 
 // internal variables of the robot
-const maxBatteryVoltage = 12.35;   
-const cutOffVoltage = 7.5; // cut-off voltage of battery
+const maxBatteryVoltage = 8.4;   
+const cutOffVoltage = 6.0; // cut-off voltage of battery
 const maxError = 8;    // maximum error possible by the IR sensors
 let followStatusGlobal = 2;
 
@@ -70,8 +69,7 @@ ipcRenderer.on("availableCOMports", (event, data) => {
 
 // function to switch to control mode
 function control(){
-    highlighter_div.style.right = '134px';
-    highlighter_div.style.width = '80px';
+    highlighter_div.style.right = '84px';
 
     pid_mode_div.style.opacity = '0';
     ctrl_mode_div.style.display = 'flex';
@@ -314,13 +312,12 @@ ipcRenderer.on('connect_request', (event, data) => {
     setInterval(() => {
         voltage_div.innerHTML = batteryVoltage + 'V';
         let batteryPercentage = (batteryVoltage - cutOffVoltage) / (maxBatteryVoltage - cutOffVoltage) * 100;
-        fill_battery_div.style.width = batteryPercentage + '%';
         if(batteryPercentage >= 70){
-            fill_battery_div.style.backgroundColor = "rgba(148, 255, 180, 0.8)";
+            voltage_div.style.color = "rgba(148, 255, 180, 0.8)";
         } else if(batteryPercentage >= 20){
-            fill_battery_div.style.backgroundColor = "rgba(255, 255, 180, 0.8)";
+            voltage_div.style.color = "rgba(255, 255, 180, 0.8)";
         } else {
-            fill_battery_div.style.backgroundColor = "rgba(255, 180, 180, 0.8)";
+            voltage_div.style.color = "rgba(255, 180, 180, 0.8)";
         }
     }, 500);
 });

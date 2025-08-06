@@ -15,8 +15,7 @@ pid_button.addEventListener("click", () =>{pid();});
 
 // function to switch to PID mode
 function pid(){
-    highlighter_div.style.right = '84px';
-    highlighter_div.style.width = '45px';
+    highlighter_div.style.right = '34px';
 
     ctrl_mode_div.style.opacity = '0';
     pid_mode_div.style.display = 'flex';
