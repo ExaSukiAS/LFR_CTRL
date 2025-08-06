@@ -36,8 +36,74 @@ body {
     --sidebar-height: calc(100vh - 35px);
 }
 
+.message_container{
+    width: 100vw;
+    position: absolute;
+    z-index: 100;
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    align-items: center;
+    top: -45px;
+    transition: .3s;
+}
+.message{
+    text-align: center;
+    font-size: 18px;
+    color: #131314;
+    font-weight: bold;
+    padding: 10px;
+    border-radius: 10px;
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    align-items: center;
+}
+.message svg{
+    width: 25px;
+    height: 25px;
+    fill: #131314;
+    margin-right: 5px;
+}
+
+.tooltip {
+    position: relative;
+    display: inline-block;
+    border-bottom: 1px dotted black; 
+}
+  
+.tooltip .tooltiptext {
+    visibility: hidden;
+    width: 120px;
+    background-color: #5893ff;
+    color: #131314;
+    font-weight: bold;
+    text-align: center;
+    padding: 5px 0;
+    border-radius: 6px;
+    position: absolute;
+    z-index: 1;
+    bottom: 125%;
+    left: 50%;
+    margin-left: -60px;
+    opacity: 0;
+    transition: .3s;
+    font-size: 13px;
+}
+.tooltip:hover .tooltiptext {
+    visibility: visible;
+    opacity: 1;
+}
+
 button{
     cursor: pointer;
+}
+
+.vertical_divider{
+    width: 2px;
+    height: 100%;
+    background-color: #2b2b2b;
+    border-radius: 10px;
 }
 
 .top_parts{
@@ -49,24 +115,51 @@ button{
 
 .IR_states {
     display: flex;
-    flex-direction: row;
+    flex-direction: column;
     justify-content: center;
     align-items: center;
     gap: 8px;
     background-color: #2b2b2b;
-    border-radius: 500px;
-    padding: 15px 10px;
-    position: absolute; 
-    left: 50%; 
-    transform: translateX(-50%); 
-  }
+    border-radius: 10px;
+    padding-left: 10px;
+    padding-right: 10px;
+    padding-top: 0px;
+    padding-bottom: 12px;
+}
+
+.IR_states .horizontalSensors{
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    align-items: center;
+    gap: 5px;
+}
   
-  .IR_states div {
-    width: 15px;
-    height: 15px;
+.IR0, .IR1, .IR2, .IR3, .IR4, .IR5, .IR6, .IR7, .IR8, .IR9, .IR10, .IR11, .IR12, .IR13, .IR14, .IR15{
+    width: 10px;
+    height: 10px;
     border-radius: 500px;
     background-color: #555555;
-  }
+}
+.IR2, .IR13{
+    margin-top: 10px;
+}
+.IR1, .IR14{
+    margin-top: 20px;
+}
+.IR0, .IR15{
+    margin-top: 30px;
+}
+
+.timer{
+    font-family: var(--font-space-grotesk);
+    font-size: 20px;
+    font-weight: 600;
+    color: rgb(255, 255, 255);
+    background-color: #2b2b2b;
+    border-radius: 7px;
+    padding: 5px 10px;
+}
 
 .left_group, .right_group{
     display: flex;
@@ -75,6 +168,7 @@ button{
 
 .bot_battery{
     width: 100px;
+    height: 32px;
     background-color: transparent;
     border: 3px solid rgb(255, 255, 255);
     border-radius: 15px;
@@ -93,8 +187,9 @@ button{
     align-items: center;
 }
 .voltage{
-    top: -27px;
-    left: 20px;
+    position: absolute;
+    top: 15px;
+    right: 260px;
     color: rgb(255, 255, 255);
     font-weight: 600;
 }
@@ -113,11 +208,9 @@ button{
     color: #131417;
     transform: scale(1);
     border-radius: 10px;
-    transition: background-color 0.1s ease-in-out, transform 0.1s ease-in-out, border-radius 0.1s ease-in-out;
+    transition: .3s;
 }
 .data_push:hover{
-    background-color: #8fb6ff;
-    transform: scale(1.2);
     border-radius: 100px;
 }
 .data_push:active{
@@ -130,12 +223,14 @@ button{
     font-weight: 600;
     border-radius: 7px;
     border: none;
-    background-color: transparent;
+    background-color: #252527;
+    background-image: none;
     color: white;
     border: 2px solid #8fb6ff;
     transform: scale(1);
-    transition: background-color 0.1s ease-in-out, transform 0.1s ease-in-out;
-    width: 110px;
+    transition: .3s;
+    width: 120px;
+    cursor: pointer;
 }
 .com::placeholder{
     color: #ffffff7e;
@@ -157,53 +252,50 @@ input[type="number"]::-webkit-outer-spin-button {
     font-family: var(--font-space-grotesk);
     border: none;
     color: rgb(255, 255, 255);
-    background-color: #5893ff;
+    background-color: #4876cc;
     border-radius: 10px;
-    transition: border-radius 0.1s ease-in-out, transform 0.1s ease-in-out;
+    transition: .3s;
 }
 .connect:hover{
     border-radius: 100px;
-    transform: scale(1.2);
 }
 .connect:active{
     transform: scale(0.8);
 }
 
 .mode{
-    width: 150px;
+    width: 190px;
     height: 35px;
     background-color: #2b2b2b;
     border-radius: 7px;
-    display: block;
-}
-
-.pid{
-    margin-left: 8px;
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    justify-items: center;
+    align-items: center;
 }
 
 .highlighter{
-    position: relative;
-    top: -26px;
-    left: 102px;
-    width: 40px;
+    position: absolute;
+    top: 14px;
+    right: 84px;
+    width: 45px;
     height: 25px;
-    background-color: white;
+    background-color: rgb(255, 255, 255);
     opacity: 0.2;
     border-radius: 5px;
-    transition: left 0.2s ease-in-out, width 0.2s ease-in-out;
+    transition: .3s;
 }
 .ctrl,
-.pid{
+.pid, 
+.settings{
     background-color: transparent;
     border: none;
     color: white;
+    fill: #ffffff;
     font-family: var(--font-space-grotesk);
     font-size: 20px;
-    margin-top: 3px;
-}
-
-.ctrl{
-    margin-left: 5px;
+    transition: .3s;
+    cursor: pointer;
 }
 
 .pid_mode{
@@ -212,7 +304,7 @@ input[type="number"]::-webkit-outer-spin-button {
     flex-direction: column;
     align-items: center;
     opacity: 1;
-    transition: opacity 0.2s ease-in-out;
+    transition: .3s;
     gap: 50px;
 }
 
@@ -224,76 +316,53 @@ input[type="number"]::-webkit-outer-spin-button {
     gap: 20px;
 }
 
-.motor_speed{
+.additional_settings{
     display: flex;
     flex-direction: column;
     justify-content: center;
     align-items: center;
-    gap: 30px;
+    gap: 20px;
 }
 
 .max_right,
 .max_left,
-.base_speed{
-    width: 50px;
+.base_speed,
+.black_stop_duration,
+.turning_delay,
+.turning_speed {
     font-family: var(--font-space-grotesk);
-    font-weight: 800;
+    font-weight: 600;
     background-color: transparent;
     border: 2px solid rgb(180, 180, 180);
     border-radius: 5px;
     color: white;
-    font-size: 20px;
+    font-size: 17px;
+    margin-left: 4px;
+    width: 70px;
+}
+
+.max_left_speed,
+.max_right_speed,
+.base_speed_group,
+.black_stop_duration_group,
+.turning_delay_group,
+.turning_speed_group {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+    gap: 5px;
+    width: 100%;
 }
 
 .max_left_speed label,
 .max_right_speed label,
-.base_speed_group label{
+.base_speed_group label,
+.black_stop_duration_group label,
+.turning_delay_group label,
+.turning_speed_group label {
     font-size: 15px;
     opacity: 0.8;
-}
-
-.current_left_speed_group,
-.current_right_speed_group,
-.PID_impact_group{
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
-    align-self: flex-end;
-    width: 50px;
-}
-
-.current_left_speed_group h6,
-.current_right_speed_group h6,
-.PID_impact_group h6{
-    text-align: center;
-    font-weight: 100;
-    font-size: 10px;
-}
-
-.current_right_speed_border,
-.current_left_speed_border,
-.PID_impact_border{
-    width: 100%;
-    height: 90px;
-    background-color: transparent;
-    border: 2px solid rgb(88, 147, 255);
-    border-radius: 5px;
-    display: flex;
-    justify-content: center;
-    align-items: flex-end;
-}
-.current_right_speed,
-.current_left_speed,
-.PID_impact_speed{
-    width: 100%;
-    height: 0%;
-    background-color: rgb(88, 147, 255, 0.4);    
-    border: none;
-    border-radius: 2px;
-    display: flex;
-    justify-content: center;
-    align-items: center;
 }
 
 
@@ -305,27 +374,32 @@ input[type="number"]::-webkit-outer-spin-button {
     gap: 30px;
 }
 
-.proportional, .integral, .derivative{
+.proportional, .integral, .derivative, .turning{
     display: flex;
     flex-direction: row;
     justify-content: center;
     align-items: center;
     gap: 20px;
 }
+.proportional label, .integral label, .derivative label, .turning label{
+    font-size: 15px;
+    opacity: 0.8;
+}
 
 .p_slider,
 .i_slider,
 .d_slider, 
+.t_slider,
 .speed_slider{
     -webkit-appearance: none; 
     appearance: none;
-    width: 50vw; 
+    width: 30vw; 
     height: 15px; 
     background: #494949; 
     outline: none; 
     opacity: 0.7; 
     -webkit-transition: .2s; 
-    transition: opacity .2s;
+    transition: .3s;
     border-radius: 100px;
 }
 .speed_slider{
@@ -336,6 +410,7 @@ input[type="number"]::-webkit-outer-spin-button {
 .p_slider:hover,
 .i_slider:hover,
 .d_slider:hover,
+.t_slider:hover,
 .speed_slider:hover{
     opacity: 1; 
 }
@@ -343,6 +418,7 @@ input[type="number"]::-webkit-outer-spin-button {
 .p_slider::-webkit-slider-thumb,
 .i_slider::-webkit-slider-thumb,
 .d_slider::-webkit-slider-thumb,
+.t_slider::-webkit-slider-thumb,
 .speed_slider::-webkit-slider-thumb{
     -webkit-appearance: none;
     appearance: none;
@@ -352,19 +428,21 @@ input[type="number"]::-webkit-outer-spin-button {
     background: #5893ff;
     cursor: pointer;
     transform: scale(1);
-    transition: transform 0.1s ease-in-out;
+    transition: .3s;
 }
 
 .p_slider::-webkit-slider-thumb:hover,
 .i_slider::-webkit-slider-thumb:hover,
 .d_slider::-webkit-slider-thumb:hover,
+.t_slider::-webkit-slider-thumb:hover,
 .speed_slider::-webkit-slider-thumb:hover{
-    transform: scale(1.4);
+    transform: scale(1.1);
 }
 
 .p_value,
 .i_value,
-.d_value{
+.d_value,
+.t_value{
     left: 83vw;
     width: 100px;
     font-family: var(--font-space-grotesk);
@@ -376,11 +454,26 @@ input[type="number"]::-webkit-outer-spin-button {
     font-size: 20px;
 }
 
+.p_impact,
+.i_impact,
+.d_impact,
+.t_impact{
+    left: 83vw;
+    width: 40px;
+    font-family: var(--font-space-grotesk);
+    font-weight: 800;
+    background-color: transparent;
+    border: 2px solid rgb(180, 180, 180);
+    border-radius: 5px;
+    color: white;
+    font-size: 20px;
+}
 
 
 .p_symbol,
 .i_symbol,
-.d_symbol{
+.d_symbol,
+.t_symbol{
     background-color: transparent;
     border: 2px solid #4876cc;
     width: 30px;
@@ -390,6 +483,15 @@ input[type="number"]::-webkit-outer-spin-button {
     justify-content: center;
     align-items: center;
     right: 30px;
+    font-size: 20px;
+}
+
+.p_symbol span,
+.i_symbol span,
+.d_symbol span,
+.t_symbol span{
+    font-size: 15px;
+    padding-top: 6px;
 }
 
 
@@ -450,7 +552,7 @@ input[type="number"]::-webkit-outer-spin-button {
     padding-left: 4px;
     padding-right: 4px;
     border-radius: 4px;
-    transform: scale(1);
+    transform: scale(1); 
     transition: transform 0.1s ease-in-out;
 }
 
@@ -476,10 +578,7 @@ input[type="number"]::-webkit-outer-spin-button {
     border-radius: 100px;
     background-color: #121212;
     box-shadow: 0 0 5px #ffffff;
-    transition: transform 0.1s ease-in-out;
-}
-.play_pause:hover{
-    transform: scale(1.2);
+    transition: .3s;
 }
 .play_pause:active{
     transform: scale(0.8);
@@ -503,13 +602,10 @@ input[type="number"]::-webkit-outer-spin-button {
     height: 50px;
     border-radius: 5px;
     background-color: #5893ff;
-    transition: transform 0.1s ease-in-out;
+    transition: .3s;
     color: #131314;
     font-weight: 700;
     font-family: var(--font-space-grotesk);
-}
-.start_follow:hover{
-    transform: scale(1.2);
 }
 .start_follow:active{
     transform: scale(0.8);
@@ -517,12 +613,13 @@ input[type="number"]::-webkit-outer-spin-button {
 
 .ctrl_mode{
     opacity: 1;
-    transition: opacity 0.2s ease-in-out;
+    transition: .3s;
     display: none;
     flex-direction: column;
     align-items: center;
     gap: 20px;
     margin-bottom: 30px;
+    width: 100vw;
 }
 
 .ctrl_head{
@@ -547,13 +644,13 @@ input[type="number"]::-webkit-outer-spin-button {
 .top_arrow, .bottom_arrow, .left_arrow, .right_arrow{
     width: 100px;
     height: 100px;
-    background-color: #5893ff;
+    background-color: #4876cc;
     border-radius: 25px;
     display: flex;
     justify-content: center;
     align-items: center;
     cursor: pointer;
-    transition: background-color 0.1s ease-in-out, transform 0.1s ease-in-out;
+    transition: .2s;
 }
 .top_arrow{
     grid-row: 1;
@@ -598,8 +695,6 @@ input[type="number"]::-webkit-outer-spin-button {
     gap: 20px;
 }
 
-
-
 .speed_input_group label{
     font-size: 15px;
     opacity: 0.8;
@@ -611,6 +706,7 @@ input[type="number"]::-webkit-outer-spin-button {
     align-items: center;
     gap: 20px;
 }
+
 
 ::-webkit-scrollbar {
     height:10px; 
