@@ -9,8 +9,9 @@ function createWindow() {
     mainWindow = new BrowserWindow({
         width: 1280,
         height: 720,
-        title: "NeuronSpark | GLASS",
+        title: "LFR",
         frame: true,
+        autoHideMenuBar: true,
         webPreferences: {
             nodeIntegration: true,
             contextIsolation: false
@@ -19,8 +20,12 @@ function createWindow() {
     mainWindow.loadFile("UI/index.html");
 }
 
-app.whenReady().then(() => {
+app.whenReady().then(() => {  
     createWindow();
+
+    const fullDataLength = 22; // the length of data received from esp32
+    const dataDelimiter = "$$##";
+    const espConfHistoryFilePath = 'ESPconfHistory.json';
 
     // get all the COM ports as return to renderer to put it as a HTML option element
     ipcMain.on('availableCOMports', (event, data) => {
@@ -55,34 +60,17 @@ app.whenReady().then(() => {
         disconnectPort();
     });
 
-    // saves PID data in PIDhistory.json
-    ipcMain.on('savePID', (event, data) => {
-        const filePath = 'PIDhistory.json';
+    // saves ESP configuration data in ESPconfHistory.json
+    ipcMain.on('saveESPconf', (event, data) => {
         const jsonKey = getCurrentTime();
 
         // Read the existing file
-        fs.readFile(filePath, 'utf8', (err, fileData) => {
-            let jsonObject = {};
-
-            if (err) {
-                if (err.code === 'ENOENT') {
-                    console.log('File not found. Creating a new one.');
-                } else {
-                    console.error('Error reading file:', err);
-                    return;
-                }
-            } else {
-                try {
-                    jsonObject = JSON.parse(fileData);
-                } catch (parseErr) {
-                    console.error('Error parsing JSON file:', parseErr);
-                    return;
-                }
-            }
+        fs.readFile(espConfHistoryFilePath, 'utf8', (err, fileData) => {
+            let jsonObject = JSON.parse(fileData);
             jsonObject[jsonKey] = data;
 
             // Write the updated JSON back to the file
-            fs.writeFile(filePath, JSON.stringify(jsonObject, null, 2), (writeErr) => {
+            fs.writeFile(espConfHistoryFilePath, JSON.stringify(jsonObject, null, 2), (writeErr) => {
                 if (writeErr) {
                     console.error('Error writing to file:', writeErr);
                 } else {
@@ -109,9 +97,14 @@ app.whenReady().then(() => {
         }
     });
 
+    ipcMain.on('getESPconfHistory', (event, data) => {
+        fs.readFile(espConfHistoryFilePath, 'utf8', (err, fileData) => {
+            const jsonObject = JSON.parse(fileData);
+            mainWindow.webContents.send('ESPconfHistoryData', jsonObject);
+        });
+    });
+
     // connects to a serial port and reads data from it
-    let MLdaaStreamStarted = false; // flag to check if the ML data stream has started
-    let MLdata = "\n"; // variable to store the ML data
     function connectToPortAndReadData(portNumber){
         port.on('open', () => {
             console.log('Serial port opened at COM' + portNumber);
@@ -121,16 +114,11 @@ app.whenReady().then(() => {
         
             port.on('data', (data) => {
                 if (mainWindow) {
-                    data = data.toString();
-                    if(MLdaaStreamStarted){
-                        data = data.replace(/(\r\n|\n|\r)/gm, ""); // remove new line characters
-                        MLdata += data;
-                    } else {
-                        let data_parts = data.split("\r\n0");
-                        data_parts = data_parts[0].split(",");
-                        if(data_parts.length == 21){
-                            mainWindow.webContents.send('serial-data', data_parts);
-                        }
+                    data = data.toString().trim();
+                    let data_parts = data.split(dataDelimiter);
+                    data_parts = data_parts[0].split(",");
+                    if(data_parts.length == fullDataLength){
+                        mainWindow.webContents.send('serial-data', data_parts);
                     }
                 }
             });

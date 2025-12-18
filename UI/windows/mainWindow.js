@@ -1,23 +1,24 @@
 const { ipcRenderer } = require('electron');
-import { showMessageUI, timerControl } from '../animations.modules.js';
+import { showMessageUI, timerControl, openORcloseWindow } from '../animations.modules.js';
+import {Pdivider, Idivider, Ddivider} from '../inputs.js';
 
 // DOM elements
-const p_value_input = document.querySelector('.p_value');
-const i_value_input = document.querySelector('.i_value');
-const d_value_input = document.querySelector('.d_value');
-const p_slider = document.querySelector('.p_slider');
-const i_slider = document.querySelector('.i_slider');
-const d_slider = document.querySelector('.d_slider');
-const max_p_impact_input = document.querySelector('.p_impact');
-const max_i_impact_input = document.querySelector('.i_impact');
-const max_d_impact_input = document.querySelector('.d_impact');
-const max_left_input = document.querySelector('.max_left');
-const max_right_input = document.querySelector('.max_right');
-const base_speed_input = document.querySelector('.base_speed');
-const black_stop_duration_input = document.querySelector('.black_stop_duration');
-const turning_speed_input = document.querySelector('.turning_speed');
-const turning_delay_input = document.querySelector('.turning_delay');
-const history_div = document.querySelector('.history');
+export const p_value_input = document.querySelector('.p_value');
+export const i_value_input = document.querySelector('.i_value');
+export const d_value_input = document.querySelector('.d_value');
+export const p_slider = document.querySelector('.p_slider');
+export const i_slider = document.querySelector('.i_slider');
+export const d_slider = document.querySelector('.d_slider');
+export const max_p_impact_input = document.querySelector('.p_impact');
+export const max_i_impact_input = document.querySelector('.i_impact');
+export const max_d_impact_input = document.querySelector('.d_impact');
+export const max_left_input = document.querySelector('.max_left');
+export const max_right_input = document.querySelector('.max_right');
+export const base_speed_input = document.querySelector('.base_speed');
+export const black_stop_duration_input = document.querySelector('.black_stop_duration');
+export const turning_speed_input = document.querySelector('.turning_speed');
+export const hard_break_time_input = document.querySelector('.hard_break_time');
+export const hard_break_speed_input = document.querySelector('.hard_break_speed');
 export const highlighter_div = document.querySelector('.highlighter');
 export const pid_mode_div = document.querySelector('.pid_mode');
 export const ctrl_mode_div = document.querySelector('.ctrl_mode');
@@ -33,18 +34,21 @@ const dataPush_button = document.querySelector(".data_push");
 const connect_button = document.querySelector('.connect');
 const play_pause_button = document.querySelector('.play_pause');
 const start_follow_button = document.querySelector('.start_follow');
+const historyButton = document.querySelector(".historyButton");
 // UI event listeners
 ctrl_button.addEventListener("click", () =>{control();});
 dataPush_button.addEventListener("click", () =>{push_data_f();});
 connect_button.addEventListener("click", () =>{connect_f();});
 play_pause_button.addEventListener("click", () =>{play_pause_f();});
 start_follow_button.addEventListener("click", () =>{startStop_follow_f(1);});
+historyButton.addEventListener("click", () => {openORcloseWindow(document.querySelector('.historyWindow'), true);});
 
+const graphUpdateInterval = 100; // determines how often the error graph will be updated in ms
 
 // internal variables of the robot
 const maxBatteryVoltage = 8.4;   
 const cutOffVoltage = 6.0; // cut-off voltage of battery
-const maxError = 8;    // maximum error possible by the IR sensors
+export const maxError = 3500;    // maximum error possible by the IR sensors
 let followStatusGlobal = 2;
 
 let IR_state_values = []; // stores the values of the sensors
@@ -53,8 +57,8 @@ let got_data = 0;   // bool to store if initial data is shown or not
 export let mode_selected = 'pid';  // modes are: pid and ctrl
 
 // function to get proper formatted data to send to the robot
-export function getDataForSending(mode, ctrlLeft, ctrlRight, Pconst, Iconst, Dconst, turningSpeed, maxLeft, maxRight, baseSpeed, blackStop, turningDelay){
-    return `${mode},${ctrlLeft},${ctrlRight},${Pconst},${Iconst},${Dconst},${turningSpeed},${maxLeft},${maxRight},${baseSpeed},${blackStop},${turningDelay},$$##\n`;
+export function formatDataForSending(mode, ctrlLeft, ctrlRight, Pconst, Iconst, Dconst, turningSpeed, maxLeft, maxRight, baseSpeed, blackStop, hardBreakTime, hardBreakMagnitude){
+    return `${mode},${ctrlLeft},${ctrlRight},${Pconst},${Iconst},${Dconst},${turningSpeed},${maxLeft},${maxRight},${baseSpeed},${blackStop},${hardBreakTime},${hardBreakMagnitude},$$##\n`;
 }
 
 // show all available COM ports as option in DOM
@@ -69,7 +73,7 @@ ipcRenderer.on("availableCOMports", (event, data) => {
 
 // function to switch to control mode
 function control(){
-    highlighter_div.style.right = '84px';
+    highlighter_div.style.right = '92px';
 
     pid_mode_div.style.opacity = '0';
     ctrl_mode_div.style.display = 'flex';
@@ -80,6 +84,7 @@ function control(){
     }, 300);
     mode_selected = 'ctrl';
 }
+
 
 // function to send necessery data (P constant, I constant, D constant, max left speed, max right speed, base speed) to the robot
 function push_data_f(){
@@ -95,23 +100,27 @@ function push_data_f(){
     let max_right_speed = parseInt(max_right_input.value);
     let base_speed = parseInt(base_speed_input.value);
     let black_stop_duration = parseInt(black_stop_duration_input.value);
-    let turning_delay = parseInt(turning_delay_input.value);
+    let hard_break_time = parseInt(hard_break_time_input.value);
+    let hard_break_magnitude = parseInt(hard_break_speed_input.value);
     let turning_speed = parseInt(turning_speed_input.value);
 
     // save the PID values to the PIDhistory.json file
-    let data_string = `${p_value_formatted},${i_value_formatted},${d_value_formatted}`;
-    let data_stringSaving = `P: ${p_value_formatted}, I: ${i_value_formatted}, D: ${d_value_formatted}, baseSpeed: ${base_speed}, maxLeftSpeed: ${max_left_speed}, maxRightSpeed: ${max_right_speed}`;
-    ipcRenderer.send("savePID", data_stringSaving);
+    let dataObjectSaving = {
+        P: p_value_formatted,
+        I: i_value_formatted,
+        D: d_value_formatted,
+        baseSpeed: base_speed,
+        maxLeftSpeed: max_left_speed,
+        maxRightSpeed: max_right_speed,
+        turningSpeed: turning_speed,
+        hardBreakTime: hard_break_time,
+        hardBreakMagnitude: hard_break_magnitude,
+        blackStopDuration: black_stop_duration
+    };
+    ipcRenderer.send("saveESPconf", dataObjectSaving);
 
     // format data for sending to bot
-    let pid_value_to_send = getDataForSending(1, 0, 0, p_value_formatted, i_value_formatted, d_value_formatted, turning_speed, max_left_speed, max_right_speed, base_speed, black_stop_duration, turning_delay);
-
-    // store in UI history
-    let history_pid = document.createElement('span');
-    history_pid.className = 'history_pid';
-    history_pid.innerHTML = data_string;
-    history_div.appendChild(history_pid);
-
+    let pid_value_to_send = formatDataForSending(1, 0, 0, p_value_formatted, i_value_formatted, d_value_formatted, turning_speed, max_left_speed, max_right_speed, base_speed, black_stop_duration, hard_break_time, hard_break_magnitude);
     ipcRenderer.send("send_data", pid_value_to_send);// send the data
     got_data = 0;
     showMessageUI(message_container_dv, message_div, "Data sent!", "normal");
@@ -124,9 +133,9 @@ function startStop_follow_f(send_data){
     followClicked = !followClicked;
     // stop following track
     if (!followClicked){
-        if(send_data == 1) ipcRenderer.send("send_data", getDataForSending(0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0));
+        if(send_data == 1) ipcRenderer.send("send_data", formatDataForSending(0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0));
     }else{
-        if(send_data == 1) ipcRenderer.send("send_data", getDataForSending(2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0));
+        if(send_data == 1) ipcRenderer.send("send_data", formatDataForSending(2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0));
     }
 }
 
@@ -157,7 +166,7 @@ function pause(){
 
 // creates the error graph using chart.js
 const ctx = document.getElementById('err_graph').getContext('2d');
-const myChart = new Chart(ctx, {
+const errorGraph = new Chart(ctx, {
   type: 'line',
   data: {
     labels: [],
@@ -170,22 +179,36 @@ const myChart = new Chart(ctx, {
     }]
   },
   options: {
-    aspectRatio: 3 / 1,
+    aspectRatio: 3.3 / 1,
     responsive: true,
     scales: {
       y: {
-        min: -8,
-        max: 8,
+        min: -3500,
+        max: 3500,
         ticks: {
-            stepSize: 0.5,  
-            color: 'rgba(255, 255, 255, 0.7)' 
+            autoSkip: false,  
+            stepSize: 500,  
+            color: 'rgba(255, 255, 255, 0.7)',
+            font: {
+                size: 9
+            }
         },
         grid: {
           color: 'rgb(88, 147, 255, 0.17)'
         }
       },
       x: {
-        //display: false,
+        display: true,
+        ticks: {
+            autoSkip: false,    
+            color: 'rgba(255, 255, 255, 0.7)',
+            font: {
+                size: 9
+            }
+        },
+        grid: {
+          color: 'rgb(88, 147, 255, 0.17)'
+        }
       }
     },
     plugins: {
@@ -202,21 +225,21 @@ const myChart = new Chart(ctx, {
 let dataArray = []; // stores the track error data received from the robots
 let lastUpdate = 0; // stores the last error graph updated time
 // updates the graph
-function throttleUpdate(chart, newData) {
+function throttleUpdate(newData) {
   const now = Date.now();   // time of now
   // updates graph in every 100ms
-  if (now - lastUpdate > 100) { 
+  if (now - lastUpdate > graphUpdateInterval) { 
     dataArray.push(newData);
     // shifts data of dataArray[] when excedding 50 elements
     if (dataArray.length > 50) { 
       dataArray.shift();
     }
     // puts the error values and labels in the graph UI
-    const labels = dataArray.map(data => new Date(data.timestamp).toLocaleTimeString());
+    const labels = dataArray.map(data => new Date(data.timestamp).toLocaleTimeString([], { second: '2-digit', fractionalSecondDigits: 2 }));
     const values = dataArray.map(data => data.value);
-    chart.data.labels = labels;
-    chart.data.datasets[0].data = values;
-    chart.update();
+    errorGraph.data.labels = labels;
+    errorGraph.data.datasets[0].data = values;
+    errorGraph.update();
 
     lastUpdate = now;
   }
@@ -241,28 +264,29 @@ ipcRenderer.on('connect_request', (event, data) => {
         // acts when data is received from the robot
         ipcRenderer.on('serial-data', (event, data_parts) => {
             // update the values of the sensors in the UI;
-            for (let i = 0; i < 16; i++) {
-                IR_state_values[i] = data_parts[i];
-                element = document.querySelector('.IR' + (i));
-                if (IR_state_values[i] == 1) {
-                    element.style.backgroundColor = 'white';
-                } else {
+            for (let i = 4; i < 12; i++) {
+                IR_state_values[i] = data_parts[i-4];
+                const element = document.querySelector('.IR' + (i));
+                if (IR_state_values[i] > 500) {
                     element.style.backgroundColor = '#555555';
+                } else {
+                    element.style.backgroundColor = 'white';
                 }
             }
             // initialize rest of the data received from the robot
-            let error = data_parts[16];
-            let Pconstant = parseFloat(data_parts[17]);
-            let Iconstant = parseFloat(data_parts[18]);
-            let Dconstant = parseFloat(data_parts[19]);
-            let turningSpeed = parseFloat(data_parts[20]);
-            let maxLeftSpeed = parseInt(data_parts[21]);
-            let maxRightSpeed = parseInt(data_parts[22]);
-            let baseSpeed = parseInt(data_parts[23]);
-            batteryVoltage = data_parts[24];
-            let followStatus = parseInt(data_parts[25]);
-            let blackStopDuration = parseInt(data_parts[26]);
-            let turningDelay = parseInt(data_parts[27]);
+            let error = parseFloat(data_parts[8]);
+            let Pconstant = parseFloat(data_parts[9]);
+            let Iconstant = parseFloat(data_parts[10]);
+            let Dconstant = parseFloat(data_parts[11]);
+            let turningSpeed = parseFloat(data_parts[12]);
+            let maxLeftSpeed = parseInt(data_parts[13]);
+            let maxRightSpeed = parseInt(data_parts[14]);
+            let baseSpeed = parseInt(data_parts[15]);
+            batteryVoltage = parseInt(data_parts[16]);
+            let followStatus = parseInt(data_parts[17]);
+            let blackStopDuration = parseInt(data_parts[18]);
+            let hardBreakTime = parseInt(data_parts[19]);
+            let hardBreakMagnitude = parseInt(data_parts[20]);
 
             // acts on change in track following state
             if (followStatusGlobal != followStatus){
@@ -283,7 +307,8 @@ ipcRenderer.on('connect_request', (event, data) => {
                 max_right_input.value = maxRightSpeed;
                 base_speed_input.value = baseSpeed;
                 black_stop_duration_input.value = blackStopDuration;
-                turning_delay_input.value = turningDelay;
+                hard_break_time_input.value = hardBreakTime;
+                hard_break_speed_input.value = hardBreakMagnitude;
                 turning_speed_input.value = turningSpeed;
                 p_value_input.value = Pconstant;
                 i_value_input.value = Iconstant;
@@ -303,7 +328,7 @@ ipcRenderer.on('connect_request', (event, data) => {
             };
             // updates the graph
             if (should_play) {
-                throttleUpdate(myChart, newData);
+                throttleUpdate(newData);
             }
             got_data += got_data > 2 ? 0 : 1; 
         });

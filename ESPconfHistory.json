@@ -1,0 +1,74 @@
+{
+  "6:33:40 PM, 18/12/2025": {
+    "P": "0.50000",
+    "I": "0.30000",
+    "D": "0.20000",
+    "baseSpeed": 100,
+    "maxLeftSpeed": 150,
+    "maxRightSpeed": 150,
+    "turningSpeed": 80,
+    "hardBreakTime": 500,
+    "hardBreakMagnitude": 200,
+    "blackStopDuration": 1000
+  },
+  "6:33:41 PM, 18/12/2025": {
+    "P": "0.60000",
+    "I": "0.35000",
+    "D": "0.25000",
+    "baseSpeed": 120,
+    "maxLeftSpeed": 170,
+    "maxRightSpeed": 170,
+    "turningSpeed": 90,
+    "hardBreakTime": 540,
+    "hardBreakMagnitude": 220,
+    "blackStopDuration": 1100
+  },
+  "6:33:42 PM, 18/12/2025": {
+    "P": "0.52000",
+    "I": "0.31000",
+    "D": "0.21000",
+    "baseSpeed": 105,
+    "maxLeftSpeed": 155,
+    "maxRightSpeed": 155,
+    "turningSpeed": 82,
+    "hardBreakTime": 510,
+    "hardBreakMagnitude": 205,
+    "blackStopDuration": 1025
+  },
+  "6:33:43 PM, 18/12/2025": {
+    "P": "0.48000",
+    "I": "0.29000",
+    "D": "0.19000",
+    "baseSpeed": 100,
+    "maxLeftSpeed": 145,
+    "maxRightSpeed": 145,
+    "turningSpeed": 78,
+    "hardBreakTime": 490,
+    "hardBreakMagnitude": 195,
+    "blackStopDuration": 975
+  },
+  "6:33:44 PM, 18/12/2025": {
+    "P": "0.51000",
+    "I": "0.30000",
+    "D": "0.20000",
+    "baseSpeed": 102,
+    "maxLeftSpeed": 152,
+    "maxRightSpeed": 152,
+    "turningSpeed": 81,
+    "hardBreakTime": 505,
+    "hardBreakMagnitude": 202,
+    "blackStopDuration": 1012
+  },
+  "6:33:45 PM, 18/12/2025": {
+    "P": "0.56000",
+    "I": "0.33000",
+    "D": "0.23000",
+    "baseSpeed": 112,
+    "maxLeftSpeed": 162,
+    "maxRightSpeed": 162,
+    "turningSpeed": 87,
+    "hardBreakTime": 525,
+    "hardBreakMagnitude": 212,
+    "blackStopDuration": 1062
+  }
+}

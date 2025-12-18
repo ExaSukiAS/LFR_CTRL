@@ -1,3 +1,5 @@
+import { maxError } from './windows/mainWindow.js'
+
 const p_value_input = document.querySelector('.p_value');
 const i_value_input = document.querySelector('.i_value');
 const d_value_input = document.querySelector('.d_value');
@@ -10,17 +12,10 @@ const max_i_impact_input = document.querySelector('.i_impact');
 const max_d_impact_input = document.querySelector('.d_impact');
 const speed_slider = document.querySelector('.speed_slider');
 
-const maxError = 8;    // maximum error possible by the IR sensors
-
-// maximum values of the P, I and D constants
-let maxP = 1;
-let maxI = 1;
-let maxD = 1;
-
 // dividers for the P, I and D constants
-let Pdivider = 12000/maxP;
-let Idivider = 12000/maxI;
-let Ddivider = 12000/maxD;
+export const Pdivider = 4000000;
+export const Idivider = 4000000;
+export const Ddivider = 4000000;
 
 // Act on the change of P, I and D sliders' value
 p_slider.oninput = function() {

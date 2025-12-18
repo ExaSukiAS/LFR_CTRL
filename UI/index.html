@@ -113,17 +113,18 @@
         <label>Stop Duration(ms): </label>
         <input class = "black_stop_duration" type="number" value="0">
       </div>
-      <div class = "turning_delay_group">
-        <label>Turning Delay(ms): </label>
-        <input class = "turning_delay" type="number" value="0">
+      <div class = "hard_break_time_group">
+        <label>hard break duration (ms): </label>
+        <input class = "hard_break_time" type="number" value="0">
+      </div>
+      <div class = "hard_break_speed_group">
+        <label>Hard break magnitude: </label>
+        <input class = "hard_break_speed" type="number" value="0">
       </div>
     </div>
   </div>
 
-  <div class = "history_err_group">
-    <div class = "history">
-        <span style = "margin-top: 5px;">History</span>
-    </div>
+  <div class = "err_group">
     <div class = "err_cnt">
       <canvas id="err_graph" class = "err_graph"></canvas>
     </div>
@@ -152,8 +153,39 @@
   <div class = "ctrl_head">Use Keyboard or display Arrow keys to control the bot</div>
 </div>
 
+<div class = "historyWindow">
+  <div class = "historyWindowMain">
+    <button class = "closeHistory"><svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="#e3e3e3"><path d="m256-200-56-56 224-224-224-224 56-56 224 224 224-224 56 56-224 224 224 224-56 56-224-224-224 224Z"/></svg></button>
+    <div class = "historyHeader">Data History</div>
+    <div class = "historyContent">
+      <table class = "historyTable">
+        <thead>
+          <tr>
+            <th>Timestamp</th>
+            <th>P</th>
+            <th>I</th>
+            <th>D</th>
+            <th>Base Speed</th>
+            <th>Max Left Speed</th>
+            <th>Max Right Speed</th>
+            <th>Turning Speed</th>
+            <th>Hard Break Duration</th>
+            <th>Hard Break Magnitude</th>
+            <th>Stop Duration</th>
+          </tr>
+        </thead>
+        <tbody class = "historyTableBody">
+          <!-- History data will be populated here dynamically -->
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+<div class = "historyButton"><svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="#e3e3e3"><path d="M320-160q-33 0-56.5-23.5T240-240v-120h120v-90q-35-2-66.5-15.5T236-506v-44h-46L60-680q36-46 89-65t107-19q27 0 52.5 4t51.5 15v-55h480v520q0 50-35 85t-85 35H320Zm120-200h240v80q0 17 11.5 28.5T720-240q17 0 28.5-11.5T760-280v-440H440v24l240 240v56h-56L510-514l-8 8q-14 14-29.5 25T440-464v104ZM224-630h92v86q12 8 25 11t27 3q23 0 41.5-7t36.5-25l8-8-56-56q-29-29-65-43.5T256-684q-20 0-38 3t-36 9l42 42Zm376 350H320v40h286q-3-9-4.5-19t-1.5-21Zm-280 40v-40 40Z"/></svg></div>
+<div class = "mapButton"><svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="#e3e3e3"><path d="M640-560v-126 126ZM174-132q-20 8-37-4.5T120-170v-560q0-13 7.5-23t20.5-15l212-72 240 84 186-72q20-8 37 4.5t17 33.5v337q-15-23-35.5-42T760-528v-204l-120 46v126q-21 0-41 3.5T560-546v-140l-160-56v523l-226 87Zm26-96 120-46v-468l-120 40v474Zm440-12q34 0 56.5-20t23.5-60q1-34-22.5-57T640-400q-34 0-57 23t-23 57q0 34 23 57t57 23Zm0 80q-66 0-113-47t-47-113q0-66 47-113t113-47q66 0 113 47t47 113q0 23-5.5 43.5T778-238l102 102-56 56-102-102q-18 11-38.5 16.5T640-160ZM320-742v468-468Z"/></svg></div>
 </body>
-<script src = './windows/mainWindow.js' type="module"></script>
 <script src = 'inputs.js' type="module"></script>
+<script src = './windows/mainWindow.js' type="module"></script>
 <script src = './windows/controlWindow.js' type="module"></script>
+<script src = './windows/historyWindow.js' type="module"></script>
 </html>

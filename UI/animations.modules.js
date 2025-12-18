@@ -13,8 +13,8 @@ export function showMessageUI(container_dv, message_div, textToShow, type){
     }, 2000);
 }
 
-let timerInterval;
 // mode = 0: start, mode = 1: stop, mode = 2: reset
+let timerInterval;
 export function timerControl(timer_div, mode) {
     if (mode === 0) {
         timer_div.style.border = "2px solid #5893ff";
@@ -34,5 +34,37 @@ export function timerControl(timer_div, mode) {
     } else if (mode === 2) {
         cancelAnimationFrame(timerInterval);
         timer_div.innerHTML = "00:00:000";
+    }
+}
+
+// opens or closes a window within a page
+export function openORcloseWindow(element, on, options = {}) {
+    const {
+        maxWidth = "100%",
+        maxHeight = "90%",
+        openingTop = "40px",
+        openingLeft = "0px",
+        closingTop = "100%",
+        closingLeft = "50%",
+        closingWidth = "0",
+        closingHeight = "0" 
+    } = options;
+
+    if (on) {
+        element.style.display = "flex";
+        setTimeout(() => {
+            element.style.width = maxWidth;
+            element.style.top = openingTop;
+            element.style.height = maxHeight;
+            element.style.left = openingLeft;
+        }, 1);
+    } else {
+        element.style.width = closingWidth;
+        element.style.top = closingTop;
+        element.style.height = closingHeight;
+        element.style.left = closingLeft;
+        setTimeout(() => {
+            element.style.display = "none";
+        }, 200);
     }
 }

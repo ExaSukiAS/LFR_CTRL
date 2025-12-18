@@ -1,4 +1,4 @@
-import { getDataForSending, highlighter_div, pid_mode_div, ctrl_mode_div, mode_selected } from "./mainWindow.js";
+import { formatDataForSending, highlighter_div, pid_mode_div, ctrl_mode_div, mode_selected } from "./mainWindow.js";
 const { ipcRenderer } = require('electron');
 
 // DOM elements
@@ -15,7 +15,7 @@ pid_button.addEventListener("click", () =>{pid();});
 
 // function to switch to PID mode
 function pid(){
-    highlighter_div.style.right = '34px';
+    highlighter_div.style.right = '40px';
 
     ctrl_mode_div.style.opacity = '0';
     pid_mode_div.style.display = 'flex';
@@ -30,7 +30,7 @@ function pid(){
 function sendControlData(leftMotor, rightMotor) {
     let motorSpeed = motor_speed_value_input.value;
     if (mode_selected == 'ctrl') {
-        ipcRenderer.send("send_data", getDataForSending(0, leftMotor * motorSpeed, rightMotor * motorSpeed, 0, 0, 0, 0, 0, 0, 0, 0, 0));
+        ipcRenderer.send("send_data", formatDataForSending(0, leftMotor * motorSpeed, rightMotor * motorSpeed, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0));
     }
 }
 
