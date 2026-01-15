@@ -2,6 +2,13 @@ const { ipcRenderer } = require('electron');
 import { showMessageUI, timerControl, openORcloseWindow } from '../animations.modules.js';
 import {Pdivider, Idivider, Ddivider} from '../inputs.js';
 
+// internal variables of the robot
+let maxBatteryVoltage = 8.4; // full battery voltage
+let cutOffVoltage = 6.0; // cut-off voltage of battery
+export let maxError = 4.5;    // maximum error possible by the IR sensors
+let minError = -4.5;   // minimum error possible by the IR sensors
+let errorStep = 0.5; // step of error change
+
 // DOM elements
 export const p_value_input = document.querySelector('.p_value');
 export const i_value_input = document.querySelector('.i_value');
@@ -41,15 +48,14 @@ dataPush_button.addEventListener("click", () =>{push_data_f();});
 connect_button.addEventListener("click", () =>{connect_f();});
 play_pause_button.addEventListener("click", () =>{play_pause_f();});
 start_follow_button.addEventListener("click", () =>{startStop_follow_f(1);});
-historyButton.addEventListener("click", () => {openORcloseWindow(document.querySelector('.historyWindow'), true);});
+historyButton.addEventListener("click", () => {
+    ipcRenderer.send('getESPconfHistory', "1"); // request the main process to send the history data
+    openORcloseWindow(document.querySelector('.historyWindow'), true);
+});
 
 const graphUpdateInterval = 100; // determines how often the error graph will be updated in ms
 
-// internal variables of the robot
-const maxBatteryVoltage = 8.4;   
-const cutOffVoltage = 6.0; // cut-off voltage of battery
-export const maxError = 3500;    // maximum error possible by the IR sensors
-let followStatusGlobal = 2;
+let followStatusGlobal = 2; // stores the current follow status of the robot
 
 let IR_state_values = []; // stores the values of the sensors
 let got_data = 0;   // bool to store if initial data is shown or not
@@ -69,6 +75,10 @@ ipcRenderer.on("availableCOMports", (event, data) => {
     option.value = data;
     option.textContent = data;
     comSelect_div.appendChild(option);
+});
+
+ipcRenderer.on('showMessageUI', (event, data) => {
+    showMessageUI(message_container_dv, message_div, data.message, data.type);
 });
 
 // function to switch to control mode
@@ -183,11 +193,11 @@ const errorGraph = new Chart(ctx, {
     responsive: true,
     scales: {
       y: {
-        min: -3500,
-        max: 3500,
+        min: minError,
+        max: maxError,
         ticks: {
             autoSkip: false,  
-            stepSize: 500,  
+            stepSize: errorStep,  
             color: 'rgba(255, 255, 255, 0.7)',
             font: {
                 size: 9
@@ -264,29 +274,29 @@ ipcRenderer.on('connect_request', (event, data) => {
         // acts when data is received from the robot
         ipcRenderer.on('serial-data', (event, data_parts) => {
             // update the values of the sensors in the UI;
-            for (let i = 4; i < 12; i++) {
-                IR_state_values[i] = data_parts[i-4];
+            for (let i = 3; i < 13; i++) {
+                IR_state_values[i] = data_parts[i-3];
                 const element = document.querySelector('.IR' + (i));
-                if (IR_state_values[i] > 500) {
+                if (IR_state_values[i] == 0) {
                     element.style.backgroundColor = '#555555';
                 } else {
                     element.style.backgroundColor = 'white';
                 }
             }
             // initialize rest of the data received from the robot
-            let error = parseFloat(data_parts[8]);
-            let Pconstant = parseFloat(data_parts[9]);
-            let Iconstant = parseFloat(data_parts[10]);
-            let Dconstant = parseFloat(data_parts[11]);
-            let turningSpeed = parseFloat(data_parts[12]);
-            let maxLeftSpeed = parseInt(data_parts[13]);
-            let maxRightSpeed = parseInt(data_parts[14]);
-            let baseSpeed = parseInt(data_parts[15]);
-            batteryVoltage = parseInt(data_parts[16]);
-            let followStatus = parseInt(data_parts[17]);
-            let blackStopDuration = parseInt(data_parts[18]);
-            let hardBreakTime = parseInt(data_parts[19]);
-            let hardBreakMagnitude = parseInt(data_parts[20]);
+            let error = parseFloat(data_parts[10]);
+            let Pconstant = parseFloat(data_parts[11]);
+            let Iconstant = parseFloat(data_parts[12]);
+            let Dconstant = parseFloat(data_parts[13]);
+            let turningSpeed = parseFloat(data_parts[14]);
+            let maxLeftSpeed = parseInt(data_parts[15]);
+            let maxRightSpeed = parseInt(data_parts[16]);
+            let baseSpeed = parseInt(data_parts[17]);
+            batteryVoltage = parseInt(data_parts[18]);
+            let followStatus = parseInt(data_parts[19]);
+            let blackStopDuration = parseInt(data_parts[20]);
+            let hardBreakTime = parseInt(data_parts[21]);
+            let hardBreakMagnitude = parseInt(data_parts[22]);
 
             // acts on change in track following state
             if (followStatusGlobal != followStatus){

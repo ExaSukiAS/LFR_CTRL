@@ -13,11 +13,11 @@ closeHistoryButton.addEventListener('click', () => {
     openORcloseWindow(document.querySelector('.historyWindow'), false);
 });
 
-ipcRenderer.send('getESPconfHistory', "1"); // request the main process to send the history data
 ipcRenderer.on('ESPconfHistoryData', (event, data) => {
+    historyTableBody.innerHTML = '';// clear the table body first
     // convert data object to array
-    let dataArray = Object.values(data);
-    let timestamps = Object.keys(data);
+    let dataArray = Object.values(data).reverse();
+    let timestamps = Object.keys(data).reverse();
     let fullHTML = '';
 
     for (let i = 0; i < dataArray.length; i++) {

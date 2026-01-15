@@ -1,5 +1,6 @@
 import { maxError } from './windows/mainWindow.js'
 
+// DOM elements
 const p_value_input = document.querySelector('.p_value');
 const i_value_input = document.querySelector('.i_value');
 const d_value_input = document.querySelector('.d_value');
@@ -13,9 +14,9 @@ const max_d_impact_input = document.querySelector('.d_impact');
 const speed_slider = document.querySelector('.speed_slider');
 
 // dividers for the P, I and D constants
-export const Pdivider = 4000000;
-export const Idivider = 4000000;
-export const Ddivider = 4000000;
+export const Pdivider = 6000;
+export const Idivider = 6000;
+export const Ddivider = 3000;
 
 // Act on the change of P, I and D sliders' value
 p_slider.oninput = function() {

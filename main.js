@@ -23,9 +23,13 @@ function createWindow() {
 app.whenReady().then(() => {  
     createWindow();
 
-    const fullDataLength = 22; // the length of data received from esp32
+    const fullDataLength = 24; // the length of data received from esp32
     const dataDelimiter = "$$##";
     const espConfHistoryFilePath = 'ESPconfHistory.json';
+    const robotSettingsFilePath = 'robotSettings.json';
+
+    let lastDataTimestamp = Date.now();
+    let connected = false;
 
     // get all the COM ports as return to renderer to put it as a HTML option element
     ipcMain.on('availableCOMports', (event, data) => {
@@ -104,12 +108,20 @@ app.whenReady().then(() => {
         });
     });
 
+    ipcMain.on('getRobotSettings', (event, data) => {
+        fs.readFile(robotSettingsFilePath, 'utf8', (err, fileData) => {
+            const jsonObject = JSON.parse(fileData);
+            mainWindow.webContents.send('robotSettingsData', jsonObject);
+        });
+    });
+
     // connects to a serial port and reads data from it
     function connectToPortAndReadData(portNumber){
         port.on('open', () => {
             console.log('Serial port opened at COM' + portNumber);
             if (mainWindow) {
                 mainWindow.webContents.send('connect_request', 'success');
+                connected = true;
             }
         
             port.on('data', (data) => {
@@ -119,6 +131,7 @@ app.whenReady().then(() => {
                     data_parts = data_parts[0].split(",");
                     if(data_parts.length == fullDataLength){
                         mainWindow.webContents.send('serial-data', data_parts);
+                        lastDataTimestamp = Date.now();
                     }
                 }
             });
@@ -128,6 +141,19 @@ app.whenReady().then(() => {
             });
         });
     }
+
+    setInterval(() => {
+        if (!connected) return;
+
+        const currentTime = Date.now();
+        const timeDifference = currentTime - lastDataTimestamp;
+
+        if (timeDifference > 1000) {
+            console.error('No data received for 1 seconds. Disconnecting...');
+            mainWindow.webContents.send('showMessageUI', {message: 'Connection lost. Disconnecting...', type: 'error'});
+            disconnectPort();
+        }
+    }, 400); 
 
     // send data via serial port
     function sendData(data){
@@ -154,6 +180,7 @@ app.whenReady().then(() => {
                     console.log('Serial port closed successfully');
                     if (mainWindow) {
                         mainWindow.webContents.send('disconnect_request', 'success');
+                        connected = false;
                     }
                 }
             });
